@@ -1,0 +1,49 @@
+# Runs on GitHub's free tier for public repositories. This workflow has NOT been executed
+# yet (the project was delivered as a ZIP); treat the first run as its own test.
+name: CI
+on:
+  push:
+  pull_request:
+
+jobs:
+  backend:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: carebridge
+          POSTGRES_PASSWORD: carebridge
+          POSTGRES_DB: carebridge_test
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U carebridge" --health-interval 5s --health-timeout 3s --health-retries 20
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install -r requirements.txt -r requirements-dev.txt
+      - run: pytest tests/unit
+      - run: pytest tests/integration
+        env:
+          TEST_DATABASE_URL: postgresql+psycopg://carebridge:carebridge@localhost:5432/carebridge_test
+
+  frontend:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+      - run: npm install
+      - run: npm run typecheck
+      - run: npm test
+      - run: npm run build
+      - run: python ../tools/check_i18n.py

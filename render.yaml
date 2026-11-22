@@ -1,0 +1,29 @@
+# Render blueprint for the backend only (free web service). The database is Supabase
+# Postgres, because Render's free Postgres expires after 30 days.
+# Secrets are entered in the Render dashboard (sync: false); none are stored in this file.
+services:
+  - type: web
+    name: carebridge-api
+    runtime: docker
+    plan: free
+    rootDir: backend
+    healthCheckPath: /api/v1/health
+    envVars:
+      - key: APP_ENV
+        value: production
+      - key: DATABASE_URL
+        sync: false
+      - key: JWT_SECRET_KEY
+        generateValue: true
+      - key: CORS_ORIGINS
+        sync: false
+      - key: LLM_PROVIDER
+        value: none
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: SPEECH_PROVIDER
+        value: none
+      - key: AZURE_SPEECH_KEY
+        sync: false
+      - key: AZURE_SPEECH_REGION
+        sync: false
