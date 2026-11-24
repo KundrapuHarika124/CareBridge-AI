@@ -13,6 +13,7 @@ const NAV: Record<Role, { to: string; key: string }[]> = {
     { to: "/appointments", key: "nav.appointments" },
     { to: "/care-circle", key: "nav.careCircle" },
     { to: "/settings", key: "nav.settings" },
+    { to: "/telemedicine", key: "nav.telemedicine" },
   ],
   CAREGIVER: [
     { to: "/home", key: "nav.home" },
@@ -24,6 +25,7 @@ const NAV: Record<Role, { to: string; key: string }[]> = {
   DOCTOR: [
     { to: "/doctor", key: "nav.schedule" },
     { to: "/settings", key: "nav.settings" },
+    { to: "/telemedicine", key: "nav.telemedicine" },
   ],
   HOSPITAL_ADMIN: [
     { to: "/admin", key: "nav.overview" },

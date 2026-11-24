@@ -214,15 +214,16 @@ def reset_password(body: ResetPasswordIn, request: Request, db: Session = Depend
     user = db.execute(
         select(User).where(User.id == reset.user_id).with_for_update()
     ).scalar_one_or_none()
+    
     if (
-                user is None
-                or not password_ok
-                or not user.is_active
-                or (
-                    user.role == ROLE_HOSPITAL_ADMIN
-                    and not access.has_approved_hospital(db, user)
-                )
-            ):
+            user is None
+            or not user.is_active
+            or (
+                user.role == ROLE_HOSPITAL_ADMIN
+                and not access.has_approved_hospital(db, user)
+            )
+        ):
+
         reset.used_at = now
         db.commit()
         raise errors.bad_request(

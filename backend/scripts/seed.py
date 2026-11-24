@@ -81,6 +81,7 @@ DOCTOR_NAMES = [
     "Dr. Imran A (Demo)", "Dr. Jyothi B (Demo)", "Dr. Kiran D (Demo)", "Dr. Lalitha G (Demo)",
     "Dr. Mahesh C (Demo)", "Dr. Nandini J (Demo)", "Dr. Omkar L (Demo)", "Dr. Padma H (Demo)",
     "Dr. Qadir F (Demo)",
+    "Dr. Ramesh S (Demo)", "Dr. Sravya P (Demo)", "Dr. Teja M (Demo)",
 ]
 
 QUALIFICATIONS = {

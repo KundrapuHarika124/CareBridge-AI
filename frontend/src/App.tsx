@@ -18,6 +18,7 @@ import Settings from "./pages/Settings";
 import Discover from "./pages/Discover";
 import SuperAdmin from "./pages/SuperAdmin";
 import { Loading } from "./ui";
+import Telemedicine from "./pages/Telemedicine";
 
 export function homePath(role: Role): string {
   if (role === "DOCTOR") return "/doctor";
@@ -62,7 +63,13 @@ export default function App() {
       <Route path="/patients" element={<Guard roles={["CAREGIVER"]}><CaregiverPatients /></Guard>} />
 
       <Route path="/doctor" element={<Guard roles={["DOCTOR"]}><DoctorToday /></Guard>} />
-
+      <Route path="/telemedicine"
+        element={
+          <Guard roles={["PATIENT", "DOCTOR"]}>
+            <Telemedicine />
+          </Guard>
+        }
+      />
       <Route path="/admin" element={<Guard roles={["HOSPITAL_ADMIN"]}><AdminOverview /></Guard>} />
       <Route path="/admin/doctors" element={<Guard roles={["HOSPITAL_ADMIN"]}><AdminDoctors /></Guard>} />
       <Route path="/admin/schedules" element={<Guard roles={["HOSPITAL_ADMIN"]}><AdminSchedules /></Guard>} />
