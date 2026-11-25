@@ -48,7 +48,7 @@
   },
   "status": {
     "CONFIRMED": "Confirmed",
-    "PENDING": "Pending",
+    "PENDING": "Awaiting doctor approval",
     "COMPLETED": "Completed",
     "CANCELLED": "Cancelled",
     "NO_SHOW": "Did not attend",
@@ -137,7 +137,7 @@
     "confirm": "Confirm booking",
     "confirmReschedule": "Confirm new time",
     "chooseAnotherTime": "Choose another time",
-    "success": "The appointment is booked.",
+    "success": "Your appointment request has been sent. It will be confirmed after the doctor approves it.",
     "rescheduled": "The appointment has been moved.",
     "addDetails": "View appointment"
   },
@@ -301,7 +301,10 @@
     "CARE_REJECTED": "Your caregiver request was declined.",
     "CARE_MODIFIED": "{{patient_name}} has changed what you are allowed to do.",
     "CARE_REVOKED": "{{patient_name}} has removed your access.",
-    "WAITLIST_OFFER": "A time has opened for {{patient_name}} with {{doctor_name}}: {{when}}. The offer is held until {{expires}}."
+    "WAITLIST_OFFER": "A time has opened for {{patient_name}} with {{doctor_name}}: {{when}}. The offer is held until {{expires}}.",
+    "APPOINTMENT_REQUESTED": "Appointment request sent: {{patient_name}} with {{doctor_name}} at {{hospital_name}}, {{when}}.",
+    "APPOINTMENT_APPROVED": "Your appointment with {{doctor_name}} has been approved.",
+    "APPOINTMENT_REJECTED": "Your appointment request with {{doctor_name}} was declined. The time is available again."
   },
   "settings": {
     "profile": "Your details",
@@ -331,7 +334,10 @@
     "followUpVisible": "The patient, and caregivers the patient has allowed, can read this.",
     "saveFollowUp": "Save follow-up",
     "markCompleted": "Mark as completed",
-    "markNoShow": "Mark as did not attend"
+    "markNoShow": "Mark as did not attend",
+    "approveRequest": "Approve request",
+    "rejectRequest": "Reject request",
+    "pendingHint": "This appointment is waiting for your decision."
   },
   "admin": {
     "noHospital": "This account is not linked to a hospital.",
