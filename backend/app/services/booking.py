@@ -413,7 +413,7 @@ def review_request(
         notification = "APPOINTMENT_REJECTED"
     audit(db, actor_id=actor.id, action=action, entity_type="appointment", entity_id=appt.id,
           hospital_id=aff.hospital_id, request_id=request_id, meta={"by_role": actor.role})
-    notify(db, [appt.patient.user_id, appt.booked_by_user_id, actor.id], notification, _payload(appt))
+    notify(db, [appt.patient.user_id, appt.booked_by_user_id], notification, _payload(appt))
     db.commit()
     return appt
 
