@@ -9,6 +9,8 @@ def test_intake_summary_review_and_doctor_workflow(client, world):
     appt = book(client, pat, world["h1"]["slots"][0]).json()["data"]
     base = f"{API}/appointments/{appt['id']}"
     doctor = login(client, "doctor1@test.demo")
+    approved = client.post(API + "/doctor/appointments/" + appt["id"] + "/approve", headers=doctor["headers"])
+    assert approved.status_code == 200 and approved.json()["data"]["status"] == "CONFIRMED"
 
     intake = client.get(f"{base}/intake", headers=pat["headers"]).json()["data"]
     assert intake["can_edit"] and len(intake["questionnaire"]["questions"]) == 2
@@ -52,7 +54,7 @@ def test_intake_summary_review_and_doctor_workflow(client, world):
     assert done["status"] == "COMPLETED"
     assert client.post(f"{base}/complete", headers=doctor["headers"]).status_code == 409
     types = {n["type"] for n in client.get(f"{API}/me/notifications", headers=pat["headers"]).json()["data"]}
-    assert {"APPOINTMENT_BOOKED", "FOLLOW_UP_ADDED"} <= types
+    assert {"APPOINTMENT_REQUESTED", "APPOINTMENT_APPROVED", "FOLLOW_UP_ADDED"} <= types
 
 
 def test_changing_answers_discards_the_old_summary(client, world):
@@ -191,7 +193,11 @@ def test_reminder_job_notifies_patient_once(client, world, db):
 
     pat = register(client, "A", "a@test.demo")
     soon = make_slot(db, world["h1"]["aff"], 3)
-    assert book(client, pat, soon).status_code == 201
+    appt = book(client, pat, soon).json()["data"]
+    assert jobs.send_reminders(db) == 0
+    doctor = login(client, "doctor1@test.demo")
+    approved = client.post(API + "/doctor/appointments/" + appt["id"] + "/approve", headers=doctor["headers"])
+    assert approved.status_code == 200
     assert jobs.send_reminders(db) == 1
     assert jobs.send_reminders(db) == 0
     types = [n["type"] for n in client.get(f"{API}/me/notifications", headers=pat["headers"]).json()["data"]]
