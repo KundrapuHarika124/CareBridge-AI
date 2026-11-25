@@ -10,6 +10,7 @@ from app.constants import (
     APPT_ACTIVE,
     APPT_COMPLETED,
     APPT_NO_SHOW,
+    APPT_PENDING,
     OFFER_OPEN,
     PERM_BOOK_APPOINTMENTS,
     PERM_CANCEL_APPOINTMENTS,
@@ -209,7 +210,11 @@ def doctor_appointments(
     rows = db.scalars(
         select(Appointment)
         .join(AppointmentSlot, AppointmentSlot.id == Appointment.slot_id)
-        .where(AppointmentSlot.doctor_id == doctor.id, ((Appointment.status == "PENDING") | ((AppointmentSlot.starts_at >= start) & (AppointmentSlot.starts_at < end))))
+        .where(
+            AppointmentSlot.doctor_id == doctor.id,
+            (Appointment.status == APPT_PENDING)
+            | ((AppointmentSlot.starts_at >= start) & (AppointmentSlot.starts_at < end)),
+        )
         .order_by(AppointmentSlot.starts_at)
     ).all()
     return ok(request, [_view(db, user, a, "DOCTOR") for a in rows], total=len(rows))
