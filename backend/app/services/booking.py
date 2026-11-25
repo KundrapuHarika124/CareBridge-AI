@@ -21,6 +21,8 @@ from app.constants import (
     APPT_COMPLETED,
     APPT_CONFIRMED,
     APPT_NO_SHOW,
+    APPT_PENDING,
+    APPT_REJECTED,
     APPT_RESCHEDULED,
     SLOT_AVAILABLE,
     SLOT_BOOKED,
@@ -192,7 +194,7 @@ def book(
         slot_id=slot.id,
         patient_id=patient.id,
         booked_by_user_id=actor.id,
-        status=APPT_CONFIRMED,
+        status=APPT_CONFIRMED if held_offer else APPT_PENDING,
         reason_text=(reason or "").strip() or None,
         idempotency_key=idempotency_key,
     )
@@ -204,14 +206,14 @@ def book(
         audit(
             db,
             actor_id=actor.id,
-            action="APPOINTMENT_BOOKED",
+            action="WAITLIST_APPOINTMENT_BOOKED" if held_offer else "APPOINTMENT_REQUESTED",
             entity_type="appointment",
             entity_id=appt.id,
             hospital_id=aff.hospital_id,
             request_id=request_id,
             meta={"slot_id": str(slot.id), "patient_id": str(patient.id)},
         )
-        notify(db, [patient.user_id, actor.id, aff.doctor.user_id], "APPOINTMENT_BOOKED", _payload(appt))
+        notify(db, [patient.user_id, actor.id, aff.doctor.user_id], "APPOINTMENT_BOOKED" if held_offer else "APPOINTMENT_REQUESTED", _payload(appt))
         db.commit()
     except IntegrityError:
         raise _slot_unavailable(db, slot)
@@ -377,6 +379,43 @@ def reschedule(
     except IntegrityError:
         raise _slot_unavailable(db, new_slot)
     return new
+
+
+def review_request(
+    db: Session, *, actor: User, appointment_id: uuid.UUID, approve: bool, request_id: str | None = None
+) -> Appointment:
+    """Doctor approves or rejects a pending request; rejection releases its slot atomically."""
+    from app.services import waitlist
+
+    current = db.get(Appointment, appointment_id)
+    if current is None:
+        raise errors.not_found("Appointment")
+    _lock_hospital(db, current.slot.affiliation.hospital_id)
+    slot = _lock_slot(db, current.slot_id)
+    appt = _lock_appointment(db, appointment_id)
+    if appt is None:
+        raise errors.not_found("Appointment")
+    if appt.status != APPT_PENDING:
+        db.rollback()
+        raise errors.conflict("INVALID_STATUS", f"An appointment that is {appt.status} cannot be reviewed.")
+    aff = slot.affiliation
+    if approve:
+        appt.status = APPT_CONFIRMED
+        action = "APPOINTMENT_APPROVED"
+        notification = "APPOINTMENT_APPROVED"
+    else:
+        appt.status = APPT_REJECTED
+        slot.status = SLOT_AVAILABLE
+        db.flush()
+        if slot.starts_at > utcnow():
+            waitlist.offer_slot(db, slot, hospital_locked=True, slot_locked=True)
+        action = "APPOINTMENT_REJECTED"
+        notification = "APPOINTMENT_REJECTED"
+    audit(db, actor_id=actor.id, action=action, entity_type="appointment", entity_id=appt.id,
+          hospital_id=aff.hospital_id, request_id=request_id, meta={"by_role": actor.role})
+    notify(db, [appt.patient.user_id, appt.booked_by_user_id, actor.id], notification, _payload(appt))
+    db.commit()
+    return appt
 
 
 def mark_outcome(
