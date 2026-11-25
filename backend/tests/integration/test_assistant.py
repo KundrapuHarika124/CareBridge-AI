@@ -71,7 +71,7 @@ def test_guided_booking_without_any_ai_provider(client, world):
                        json={"token": r["confirmation"]["token"]})
     assert done.status_code == 200, done.text
     data = done.json()["data"]
-    assert data["state"] == "BOOKED" and data["appointment"]["status"] == "CONFIRMED"
+    assert data["state"] == "BOOKED" and data["appointment"]["status"] == "PENDING"
     listed = client.get(f"{API}/appointments", headers=pat["headers"]).json()["data"]
     assert [a["id"] for a in listed] == [data["appointment"]["id"]]
 
@@ -90,7 +90,7 @@ def test_telugu_conversation_and_typed_yes(client, world):
     r = say(client, pat, s, text="1")
     assert r["state"] == "AWAITING_CONFIRMATION"
     r = say(client, pat, s, text="అవును")
-    assert r["state"] == "BOOKED" and r["appointment"]["status"] == "CONFIRMED"
+    assert r["state"] == "BOOKED" and r["appointment"]["status"] == "PENDING"
 
 
 def test_wrong_or_reused_confirmation_token_does_not_book(client, world):
