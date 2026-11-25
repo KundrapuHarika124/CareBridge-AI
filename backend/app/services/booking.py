@@ -206,7 +206,7 @@ def book(
         audit(
             db,
             actor_id=actor.id,
-            action="WAITLIST_APPOINTMENT_BOOKED" if held_offer else "APPOINTMENT_REQUESTED",
+            action="APPOINTMENT_BOOKED" if held_offer else "APPOINTMENT_REQUESTED",
             entity_type="appointment",
             entity_id=appt.id,
             hospital_id=aff.hospital_id,
