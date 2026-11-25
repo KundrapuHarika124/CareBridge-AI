@@ -344,7 +344,7 @@ def reschedule(
             slot_id=new_slot.id,
             patient_id=old.patient_id,
             booked_by_user_id=actor.id,
-            status=APPT_CONFIRMED,
+            status=APPT_PENDING,
             reason_text=old.reason_text,
             idempotency_key=idempotency_key,
             rescheduled_from_id=old.id,
@@ -372,7 +372,7 @@ def reschedule(
         notify(
             db,
             [new.patient.user_id, actor.id, aff.doctor.user_id, old_slot.affiliation.doctor.user_id],
-            "APPOINTMENT_RESCHEDULED",
+            "APPOINTMENT_REQUESTED",
             _payload(new),
         )
         db.commit()
