@@ -12,6 +12,7 @@ export default function DoctorToday() {
   const lang = useLang();
   const [day, setDay] = useState(() => istDate(new Date()));
   const [openId, setOpenId] = useState<string | null>(null);
+  const reviewAction = useAction();
   const list = useLoad(() => get<Appointment[]>(`/doctor/appointments${query({ on_date: day })}`), [day]);
   const rows = list.data ?? [];
 
@@ -22,6 +23,7 @@ export default function DoctorToday() {
         <label className="label" htmlFor="doctor-day">{t("doctor.date")}</label>
         <input id="doctor-day" type="date" className="input" value={day} onChange={(e) => { if (e.target.value) { setDay(e.target.value); setOpenId(null); } }} />
       </div>
+      {reviewAction.error != null && <ErrorPanel error={reviewAction.error} />}
       {list.loading && <Loading />}
       {list.error != null && <ErrorPanel error={list.error} onRetry={list.reload} />}
       {!list.loading && list.error == null && rows.length === 0 && <Empty title={t("doctor.none")} />}
@@ -36,10 +38,22 @@ export default function DoctorToday() {
               </div>
               <StatusBadge status={appt.status} />
             </div>
-            <Button variant="secondary" className="mt-2" aria-expanded={openId === appt.id} onClick={() => setOpenId(openId === appt.id ? null : appt.id)}>
-              {openId === appt.id ? t("common.close") : t("doctor.open")}
-            </Button>
-            {openId === appt.id && <Visit appointment={appt} onChanged={list.reload} />}
+            {appt.status === "PENDING" ? (
+              <div className="mt-3">
+                <p className="mb-2 text-sm text-slate-700">{t("doctor.pendingHint")}</p>
+                <div className="flex flex-wrap gap-2">
+                  <Button disabled={reviewAction.busy} onClick={async () => { const result = await reviewAction.run(() => post(`/doctor/appointments/${appt.id}/approve`)); if (result !== undefined) list.reload(); }}>{t("doctor.approveRequest")}</Button>
+                  <Button variant="danger" disabled={reviewAction.busy} onClick={async () => { const result = await reviewAction.run(() => post(`/doctor/appointments/${appt.id}/reject`)); if (result !== undefined) list.reload(); }}>{t("doctor.rejectRequest")}</Button>
+                </div>
+              </div>
+            ) : (
+              <>
+                <Button variant="secondary" className="mt-2" aria-expanded={openId === appt.id} onClick={() => setOpenId(openId === appt.id ? null : appt.id)}>
+                  {openId === appt.id ? t("common.close") : t("doctor.open")}
+                </Button>
+                {openId === appt.id && <Visit appointment={appt} onChanged={list.reload} />}
+              </>
+            )}
           </Card>
         ))}
       </div>
