@@ -209,10 +209,28 @@ def doctor_appointments(
     rows = db.scalars(
         select(Appointment)
         .join(AppointmentSlot, AppointmentSlot.id == Appointment.slot_id)
-        .where(AppointmentSlot.doctor_id == doctor.id, AppointmentSlot.starts_at >= start, AppointmentSlot.starts_at < end)
+        .where(AppointmentSlot.doctor_id == doctor.id, ((Appointment.status == "PENDING") | ((AppointmentSlot.starts_at >= start) & (AppointmentSlot.starts_at < end))))
         .order_by(AppointmentSlot.starts_at)
     ).all()
     return ok(request, [_view(db, user, a, "DOCTOR") for a in rows], total=len(rows))
+
+
+@router.post("/doctor/appointments/{appointment_id}/approve")
+def approve_request(appointment_id: uuid.UUID, request: Request, user: User = Depends(require_roles(ROLE_DOCTOR)), db: Session = Depends(get_db)):
+    appt = booking.get_appointment(db, appointment_id)
+    if access.appointment_viewer(db, user, appt, None) != "DOCTOR":
+        raise errors.not_found("Appointment")
+    appt = booking.review_request(db, actor=user, appointment_id=appt.id, approve=True, request_id=request_id_of(request))
+    return ok(request, _view(db, user, appt, "DOCTOR"))
+
+
+@router.post("/doctor/appointments/{appointment_id}/reject")
+def reject_request(appointment_id: uuid.UUID, request: Request, user: User = Depends(require_roles(ROLE_DOCTOR)), db: Session = Depends(get_db)):
+    appt = booking.get_appointment(db, appointment_id)
+    if access.appointment_viewer(db, user, appt, None) != "DOCTOR":
+        raise errors.not_found("Appointment")
+    appt = booking.review_request(db, actor=user, appointment_id=appt.id, approve=False, request_id=request_id_of(request))
+    return ok(request, _view(db, user, appt, "DOCTOR"))
 
 
 def _outcome(appointment_id, outcome, request, user, db):
