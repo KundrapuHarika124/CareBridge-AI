@@ -48,7 +48,7 @@
   },
   "status": {
     "CONFIRMED": "पुष्टि हुई",
-    "PENDING": "लंबित",
+    "PENDING": "డాక్టర్ ఆమోదం కోసం వేచి ఉంది",
     "COMPLETED": "पूरा हुआ",
     "CANCELLED": "रद्द हुआ",
     "NO_SHOW": "नहीं आए",
@@ -135,7 +135,7 @@
     "confirm": "बुकिंग की पुष्टि करें",
     "confirmReschedule": "नए समय की पुष्टि करें",
     "chooseAnotherTime": "दूसरा समय चुनें",
-    "success": "अपॉइंटमेंट बुक हो गया।",
+    "success": "మీ అపాయింట్‌మెంట్ అభ్యర్థన పంపబడింది. డాక్టర్ ఆమోదించిన తర్వాత నిర్ధారించబడుతుంది.",
     "rescheduled": "अपॉइंटमेंट का समय बदल दिया गया।",
     "addDetails": "अपॉइंटमेंट देखें"
   },
@@ -298,7 +298,10 @@
     "CARE_REJECTED": "आपका देखभालकर्ता अनुरोध अस्वीकार कर दिया गया।",
     "CARE_MODIFIED": "{{patient_name}} ने आपकी अनुमतियाँ बदलीं।",
     "CARE_REVOKED": "{{patient_name}} ने आपकी पहुँच हटा दी।",
-    "WAITLIST_OFFER": "{{patient_name}} के लिए {{doctor_name}} के यहाँ समय खाली हुआ: {{when}}। यह ऑफर {{expires}} तक है।"
+    "WAITLIST_OFFER": "{{patient_name}} के लिए {{doctor_name}} के यहाँ समय खाली हुआ: {{when}}। यह ऑफर {{expires}} तक है।",
+    "APPOINTMENT_REQUESTED": "అపాయింట్‌మెంట్ అభ్యర్థన: {{patient_name}}, {{doctor_name}}, {{hospital_name}}, {{when}}.",
+    "APPOINTMENT_APPROVED": "{{doctor_name}}తో మీ అపాయింట్‌మెంట్ ఆమోదించబడింది.",
+    "APPOINTMENT_REJECTED": "{{doctor_name}}తో మీ అపాయింట్‌మెంట్ అభ్యర్థన తిరస్కరించబడింది. ఆ సమయం మళ్లీ అందుబాటులో ఉంది."
   },
   "settings": {
     "profile": "आपके विवरण",
@@ -328,7 +331,10 @@
     "followUpVisible": "मरीज, और मरीज द्वारा अनुमत देखभालकर्ता, इसे पढ़ सकते हैं।",
     "saveFollowUp": "निर्देश सेव करें",
     "markCompleted": "पूर्ण चिह्नित करें",
-    "markNoShow": "नहीं आए चिह्नित करें"
+    "markNoShow": "नहीं आए चिह्नित करें",
+    "approveRequest": "అభ్యర్థనను ఆమోదించండి",
+    "rejectRequest": "అభ్యర్థనను తిరస్కరించండి",
+    "pendingHint": "ఈ అపాయింట్‌మెంట్ మీ నిర్ణయం కోసం వేచి ఉంది."
   },
   "admin": {
     "noHospital": "यह खाता किसी अस्पताल से जुड़ा नहीं है।",
