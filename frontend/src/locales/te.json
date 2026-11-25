@@ -48,7 +48,7 @@
   },
   "status": {
     "CONFIRMED": "నిర్ధారించబడింది",
-    "PENDING": "పెండింగ్",
+    "PENDING": "డాక్టర్ ఆమోదం కోసం వేచి ఉంది",
     "COMPLETED": "పూర్తయింది",
     "CANCELLED": "రద్దయింది",
     "NO_SHOW": "రాలేదు",
@@ -137,7 +137,7 @@
     "confirm": "బుకింగ్ నిర్ధారించండి",
     "confirmReschedule": "కొత్త సమయం నిర్ధారించండి",
     "chooseAnotherTime": "వేరే సమయం ఎంచుకోండి",
-    "success": "అపాయింట్‌మెంట్ బుక్ అయింది.",
+    "success": "మీ అపాయింట్‌మెంట్ అభ్యర్థన పంపబడింది. డాక్టర్ ఆమోదించిన తర్వాత నిర్ధారించబడుతుంది.",
     "rescheduled": "అపాయింట్‌మెంట్ సమయం మార్చబడింది.",
     "addDetails": "అపాయింట్‌మెంట్ చూడండి"
   },
@@ -301,7 +301,10 @@
     "CARE_REJECTED": "మీ సంరక్షక అభ్యర్థన తిరస్కరించబడింది.",
     "CARE_MODIFIED": "{{patient_name}} మీ అనుమతులను మార్చారు.",
     "CARE_REVOKED": "{{patient_name}} మీ అనుమతిని తొలగించారు.",
-    "WAITLIST_OFFER": "{{patient_name}} కోసం {{doctor_name}} వద్ద సమయం ఖాళీ అయింది: {{when}}. ఈ ఆఫర్ {{expires}} వరకు ఉంటుంది."
+    "WAITLIST_OFFER": "{{patient_name}} కోసం {{doctor_name}} వద్ద సమయం ఖాళీ అయింది: {{when}}. ఈ ఆఫర్ {{expires}} వరకు ఉంటుంది.",
+    "APPOINTMENT_REQUESTED": "అపాయింట్‌మెంట్ అభ్యర్థన: {{patient_name}}, {{doctor_name}}, {{hospital_name}}, {{when}}.",
+    "APPOINTMENT_APPROVED": "{{doctor_name}}తో మీ అపాయింట్‌మెంట్ ఆమోదించబడింది.",
+    "APPOINTMENT_REJECTED": "{{doctor_name}}తో మీ అపాయింట్‌మెంట్ అభ్యర్థన తిరస్కరించబడింది. ఆ సమయం మళ్లీ అందుబాటులో ఉంది."
   },
   "settings": {
     "profile": "మీ వివరాలు",
@@ -331,7 +334,10 @@
     "followUpVisible": "రోగి, మరియు రోగి అనుమతించిన సంరక్షకులు దీన్ని చదవగలరు.",
     "saveFollowUp": "సూచనలు సేవ్ చేయండి",
     "markCompleted": "పూర్తయినట్లు గుర్తించండి",
-    "markNoShow": "రాలేదని గుర్తించండి"
+    "markNoShow": "రాలేదని గుర్తించండి",
+    "approveRequest": "అభ్యర్థనను ఆమోదించండి",
+    "rejectRequest": "అభ్యర్థనను తిరస్కరించండి",
+    "pendingHint": "ఈ అపాయింట్‌మెంట్ మీ నిర్ణయం కోసం వేచి ఉంది."
   },
   "admin": {
     "noHospital": "ఈ ఖాతా ఏ ఆసుపత్రికీ అనుసంధానం కాలేదు.",
