@@ -11,11 +11,11 @@ def test_book_and_see_it_on_dashboard(client, world):
     r = book(client, pat, slot)
     assert r.status_code == 201, r.text
     appt = r.json()["data"]
-    assert appt["status"] == "CONFIRMED" and appt["hospital"]["is_simulated"] is True
+    assert appt["status"] == "PENDING" and appt["hospital"]["is_simulated"] is True
     listed = client.get(f"{API}/appointments?scope=upcoming", headers=pat["headers"]).json()["data"]
     assert [a["id"] for a in listed] == [appt["id"]]
     notes = client.get(f"{API}/me/notifications", headers=pat["headers"]).json()["data"]
-    assert notes[0]["type"] == "APPOINTMENT_BOOKED"
+    assert notes[0]["type"] == "APPOINTMENT_REQUESTED"
 
 
 def test_second_booking_of_same_slot_conflicts_with_alternatives(client, world):
@@ -74,7 +74,7 @@ def test_failed_reschedule_leaves_original_untouched(client, world):
                     json={"new_slot_id": str(slot_b.id)})
     assert r.status_code == 409
     still = client.get(f"{API}/appointments/{appt['id']}", headers=a["headers"]).json()["data"]
-    assert still["status"] == "CONFIRMED" and still["slot_id"] == str(slot_a.id)
+    assert still["status"] == "PENDING" and still["slot_id"] == str(slot_a.id)
 
 
 def test_twenty_concurrent_bookings_give_exactly_one_success(client, world):
@@ -108,8 +108,30 @@ def test_twenty_concurrent_bookings_give_exactly_one_success(client, world):
     session = SessionLocal()
     try:
         active = session.scalar(
-            select(func.count(Appointment.id)).where(Appointment.slot_id == slot_id, Appointment.status == "CONFIRMED")
+            select(func.count(Appointment.id)).where(Appointment.slot_id == slot_id, Appointment.status.in_(("PENDING", "CONFIRMED")))
         )
     finally:
         session.close()
     assert active == 1
+
+
+
+def test_doctor_can_approve_or_reject_requests_and_rejection_releases_slot(client, world, db):
+    from tests.integration.helpers import login
+
+    doctor = login(client, "doctor1@test.demo")
+    patient = register(client, "Approval", "approval@test.demo")
+    approved_slot, rejected_slot = world["h1"]["slots"][0], world["h1"]["slots"][1]
+    pending = book(client, patient, approved_slot).json()["data"]
+    schedule = client.get(API + "/doctor/appointments?on_date=" + pending["starts_at"][:10], headers=doctor["headers"]).json()["data"]
+    assert any(item["id"] == pending["id"] for item in schedule)
+    approved = client.post(API + "/doctor/appointments/" + pending["id"] + "/approve", headers=doctor["headers"])
+    assert approved.status_code == 200 and approved.json()["data"]["status"] == "CONFIRMED"
+    assert client.post(API + "/doctor/appointments/" + pending["id"] + "/approve", headers=doctor["headers"]).status_code == 409
+    rejected = book(client, patient, rejected_slot).json()["data"]
+    result = client.post(API + "/doctor/appointments/" + rejected["id"] + "/reject", headers=doctor["headers"])
+    assert result.status_code == 200 and result.json()["data"]["status"] == "REJECTED"
+    db.refresh(rejected_slot)
+    assert rejected_slot.status == "AVAILABLE"
+    types = {n["type"] for n in client.get(API + "/me/notifications", headers=patient["headers"]).json()["data"]}
+    assert {"APPOINTMENT_REQUESTED", "APPOINTMENT_APPROVED", "APPOINTMENT_REJECTED"} <= types
